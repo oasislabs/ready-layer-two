@@ -1,0 +1,8 @@
+*.rs.bk
+.oasis/
+.venv/
+data/
+dist/
+models/
+node_modules/
+target/

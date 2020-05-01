@@ -1,0 +1,19 @@
+[package]
+name = "ready_layer_two"
+version = "0.1.0"
+authors = []
+edition = "2018"
+publish = false
+
+[dependencies]
+jwt = "0.5"  # jsonwebtoken doesn't support wasi
+oasis-std = "0.4"
+rand = "0.7"
+rand_pcg = "0.2"
+sha2 = "0.8"
+
+[dev-dependencies]
+oasis-test = "0.4"
+
+[package.metadata.oasis.competition.dependencies]
+user_registry = { path = "../target/service/user_registry.wasm" }
