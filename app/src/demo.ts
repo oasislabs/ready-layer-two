@@ -14,7 +14,12 @@ import {
 } from '../service-clients/competition';
 import { UserRegistry } from '../service-clients/user-registry';
 
-import { MOCK_HOSTING_SERVICE, createGateway, logDone } from './common';
+import {
+    MOCK_HOSTING_SERVICE,
+    STATUS_MSG_WIDTH,
+    createGateway,
+    logDone,
+} from './common';
 
 async function main() {
     const gw = createGateway();
@@ -51,7 +56,7 @@ async function main() {
         Promise.all([
             uploadFile('demo/data/iris_train.csv'),
             encryptAndUploadFile('demo/data/iris_test.csv'),
-            uploadFile('demo/evaluator.py'),
+            uploadFile('app/src/evaluator.ts'),
             Promise.all([
                 // These would be uploaded after the public training data is posted
                 // but these demo models are pre-trained, so we can upload them now.
@@ -61,7 +66,7 @@ async function main() {
         ]),
     );
 
-    const endTimestampMillis = Date.now() + 5 * 1000;
+    const endTimestampMillis = Date.now() + 10 * 1000;
     const competition = await logDone(
         'Creating Competition',
         Competition.deploy(gw, {
@@ -73,25 +78,17 @@ async function main() {
         }),
     );
 
-    const loginTokens = await logDone(
-        'Obtaining login tokens',
+    await logDone(
+        'Making submissions',
         Promise.all(
-            participants.map(([name, loginCredential]) => {
-                return userRegistry.signIn({
+            participants.map(async ([name, loginCredential], i) => {
+                const participantAuthToken = await userRegistry.signIn({
                     name,
                     loginCredential,
                     audience: competition.address,
                 });
-            }),
-        ),
-    );
-
-    await logDone(
-        'Making submissions',
-        Promise.all(
-            loginTokens.map((token, i) => {
                 return competition.submit({
-                    participantAuthToken: token,
+                    participantAuthToken,
                     model: submissions[i],
                 });
             }),
@@ -105,7 +102,7 @@ async function main() {
         ),
     );
 
-    console.log('🔒 Running evaluation program (in mock enclave)');
+    console.log('Running evaluation "enclave"'.padEnd(STATUS_MSG_WIDTH), '🔒');
 
     const winnerNotification = await CompetitionCompleted.subscribe(
         gw,
@@ -124,7 +121,7 @@ async function main() {
         },
     );
 
-    console.log('🔓 Evaluation program enclave terminated');
+    console.log('Evaluation "enclave" exited'.padEnd(STATUS_MSG_WIDTH), '🔓');
 
     const { winner } = await winnerNotification.first();
     console.log(`\n🎉 ${winner} has won the competition! 🎉`);

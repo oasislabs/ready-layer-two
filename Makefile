@@ -1,6 +1,7 @@
 .PHONY: demo clean
 
 demo: dist/demo demo/models | .oasis
+	@pkill oasis || true
 	@oasis chain >/dev/null 2>&1 &
 	@yarn -s start
 	@pkill oasis
