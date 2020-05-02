@@ -1,6 +1,6 @@
-.PHONY: demo clean
+.PHONY: demo demo_deps clean
 
-demo: dist/demo demo/models | .oasis
+demo: demo_deps dist/demo | .oasis
 	@pkill oasis || true
 	@oasis chain >/dev/null 2>&1 &
 	@yarn -s start
@@ -9,11 +9,8 @@ demo: dist/demo demo/models | .oasis
 dist/demo:
 	oasis build
 
-demo/models:
-	$(MAKE) -C demo
-
-.oasis:
-	@mkdir -p $@
+demo_deps:
+	@$(MAKE) -s -C demo
 
 clean:
 	$(MAKE) -C demo clean

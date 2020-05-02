@@ -14,7 +14,7 @@ import {
 
 import { MOCK_HOSTING_SERVICE, createGateway, logDone } from './common';
 
-const SANDBOXED_EVALUATOR_IMAGE = 'ready-layer-2-evaluator:latest';
+const SANDBOXED_EVALUATOR_IMAGE = 'ready-layer-two-evaluator:latest';
 //^ this would include the hash in a not-demo
 
 tmp.setGracefulCleanup();

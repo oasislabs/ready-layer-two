@@ -1,10 +1,7 @@
 .PHONY: demo docker clean
 
-venv_dir = .venv
-
 demo: \
 	data/iris_train.csv data/iris_test.csv \
-	$(venv_dir)/installed \
 	models \
 	docker
 
@@ -20,19 +17,14 @@ data/iris_test.csv: data/iris.csv
 data:
 	@mkdir -p $@
 
-$(venv_dir)/installed: $(venv_dir)
-	@touch $@
-
-$(venv_dir): requirements.txt
-	python3 -m virtualenv $@
-	. $(venv_dir)/bin/activate; pip install -r requirements.txt
-
-models: train_models.py data/iris_train.csv
+models: train_models.py data/iris_train.csv | .docker_built
 	@mkdir -p models
-	. $(venv_dir)/bin/activate; python3 train_models.py
+	docker run --rm -v "$(shell pwd):/demo" ready-layer-two-trainer:latest python /demo/train_models.py
 
-docker: Dockerfile requirements.txt evaluator.py
-	docker build . -t ready-layer-2-evaluator:latest
+.docker_built: Dockerfile .dockerignore requirements.txt evaluator.py
+	@docker build -q . -t ready-layer-two-trainer:latest --target model-trainer
+	@docker build -q . -t ready-layer-two-evaluator:latest
+	@touch .docker_built
 
 clean:
-	rm -rf data models $(venv_dir)
+	rm -rf data models
