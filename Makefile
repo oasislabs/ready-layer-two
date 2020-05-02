@@ -7,11 +7,11 @@ demo: demo_deps dist/demo
 	@pkill oasis
 
 dist/demo:
-	oasis build
+	@oasis build
 
 demo_deps:
 	@$(MAKE) -s -C demo
 
 clean:
-	$(MAKE) -C demo clean
-	rm -rf dist node_modules target
+	@$(MAKE) -s -C demo clean
+	@rm -rf dist node_modules target
