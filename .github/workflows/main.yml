@@ -3,7 +3,25 @@ name: CI
 on: [push]
 
 jobs:
-  build-test:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          pip3 install setuptools wheel
+          pip3 install black
+          rustup toolchain add nightly-2019-08-26
+
+      - name: Lint
+        run: |
+          python3 -m black --diff demo
+          cargo fmt -- --check
+          yarn
+          yarn lint
+
+  run-demo:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -12,22 +30,10 @@ jobs:
         with:
           node-version: 12.x
 
-      - name: Install Python requirements
-        run: |
-          pip3 install setuptools wheel
-          pip3 install black
-
       - name: Install Oasis SDK
         run: |
           curl --proto '=https' --tlsv1.2 -sSL https://get.oasis.dev | python - --speedrun
           echo "::set-env name=PATH::$HOME/.local/bin::$HOME/.cargo/bin:$PATH"
-
-      - name: Lint
-        run: |
-          python3 -m black --diff *.py
-          cargo fmt -- --check
-          yarn
-          yarn lint
 
       - name: Demo
         run: make demo

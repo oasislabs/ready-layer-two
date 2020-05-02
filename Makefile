@@ -1,6 +1,6 @@
 .PHONY: demo demo_deps clean
 
-demo: demo_deps dist/demo | .oasis
+demo: demo_deps dist/demo
 	@pkill oasis || true
 	@oasis chain >/dev/null 2>&1 &
 	@yarn -s start
