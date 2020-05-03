@@ -30,17 +30,15 @@ Once you have all of the build tools, simply run `make`.
 You should see the following output:
 
 ```
-Creating UserRegistry          ✔️
-Registering participants       ✔️
-Uploading data                 ✔️
-Creating Competition           ✔️
-Making submissions             ✔️
-Waiting for competition to end ✔️
-Running evaluation "enclave"   🔒
-Beginning evaluation           ✔️
-Evaluating submissions         ✔️
-Announcing winner              ✔️
-Evaluation "enclave" exited    🔓
+✔️     Create UserRegistry
+✔️     Register participants
+✔️     Upload data
+✔️     Create Competition
+✔️     Make submissions
+✔️     Start evaluation program "enclave"
+✔️  🔒 Fetch data encryption keys
+✔️  🔒 Evaluate models on test data
+✔️  🔒 Announce winner
 
 🎉 PEGASOS has won the competition! 🎉
 ```

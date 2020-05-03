@@ -18,14 +18,17 @@ import {
     MOCK_HOSTING_SERVICE,
     STATUS_MSG_WIDTH,
     createGateway,
-    logDone,
+    TaskLogger,
 } from './common';
+
+const taskLogger = new TaskLogger();
+const logDone = taskLogger.logDone.bind(taskLogger);
 
 async function main() {
     const gw = createGateway();
 
     const userRegistry = await logDone(
-        'Creating UserRegistry',
+        'Create UserRegistry',
         UserRegistry.deploy(gw),
     );
 
@@ -35,7 +38,7 @@ async function main() {
     ];
 
     await logDone(
-        'Registering participants',
+        'Register participants',
         Promise.all(
             participants.map(([name, loginCredential]) => {
                 return userRegistry.register({
@@ -52,7 +55,7 @@ async function main() {
         evaluationProgram,
         submissions,
     ] = await logDone(
-        'Uploading data',
+        'Upload data',
         Promise.all([
             uploadFile('demo/data/iris_train.csv'),
             encryptAndUploadFile('demo/data/iris_test.csv'),
@@ -66,9 +69,9 @@ async function main() {
         ]),
     );
 
-    const endTimestampMillis = Date.now() + 10 * 1000;
+    const endTimestampMillis = Date.now() + 7 * 1000;
     const competition = await logDone(
-        'Creating Competition',
+        'Create Competition',
         Competition.deploy(gw, {
             userRegistry: userRegistry.address,
             trainDataset,
@@ -79,7 +82,7 @@ async function main() {
     );
 
     await logDone(
-        'Making submissions',
+        'Make submissions',
         Promise.all(
             participants.map(async ([name, loginCredential], i) => {
                 const participantAuthToken = await userRegistry.signIn({
@@ -96,13 +99,11 @@ async function main() {
     );
 
     await logDone(
-        'Waiting for competition to end',
+        'Start evaluation program "enclave"',
         new Promise((resolve) =>
             setTimeout(resolve, endTimestampMillis - Date.now()),
         ),
     );
-
-    console.log('Running evaluation "enclave"'.padEnd(STATUS_MSG_WIDTH), '🔒');
 
     const winnerNotification = await CompetitionCompleted.subscribe(
         gw,
@@ -120,8 +121,6 @@ async function main() {
             stdio: [null, 'inherit', 'inherit'],
         },
     );
-
-    console.log('Evaluation "enclave" exited'.padEnd(STATUS_MSG_WIDTH), '🔓');
 
     const { winner } = await winnerNotification.first();
     console.log(`\n🎉 ${winner} has won the competition! 🎉`);

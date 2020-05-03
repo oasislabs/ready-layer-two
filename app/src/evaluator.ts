@@ -12,10 +12,13 @@ import {
     EncryptedData,
 } from '../service-clients/competition';
 
-import { MOCK_HOSTING_SERVICE, createGateway, logDone } from './common';
+import { MOCK_HOSTING_SERVICE, createGateway, TaskLogger } from './common';
 
 const SANDBOXED_EVALUATOR_IMAGE = 'ready-layer-two-evaluator:latest';
 //^ this would include the hash in a not-demo
+
+const taskLogger = new TaskLogger('🔒 ');
+const logDone = taskLogger.logDone.bind(taskLogger);
 
 tmp.setGracefulCleanup();
 
@@ -36,7 +39,7 @@ async function main() {
     );
 
     const { testDataset, submissions } = await logDone(
-        'Beginning evaluation',
+        'Fetch data encryption keys',
         competition.beginEvaluation({
             attestation,
         }),
@@ -61,7 +64,7 @@ async function main() {
         );
     }
     const scores = await logDone(
-        'Evaluating submissions',
+        'Evaluate models on test data',
         Promise.all(evaluations),
     );
 
@@ -70,7 +73,7 @@ async function main() {
     )[0] as string;
 
     await logDone(
-        'Announcing winner',
+        'Announce winner',
         competition.announceWinner({ attestation, winner }),
     );
 
