@@ -21,7 +21,24 @@ jobs:
           yarn
           yarn lint
 
-  run-demo:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install Oasis SDK
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSL https://get.oasis.dev | python - --speedrun
+          echo "::set-env name=PATH::$HOME/.local/bin::$HOME/.cargo/bin:$PATH"
+
+      - name: Test
+        run: oasis test ./services/src/bin/user_registry.rs
+
+  demo:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

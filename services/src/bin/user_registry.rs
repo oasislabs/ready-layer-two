@@ -111,7 +111,7 @@ impl UserRegistry {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct UserInfo {
     name: String,
 }
@@ -176,9 +176,8 @@ mod tests {
 
         assert_eq!(
             registry.verify_token(&ctx, good_token),
-            Ok(Claims {
-                sub: user_a.to_string(),
-                aud: format!("{:x}", aud_addr),
+            Ok(UserInfo {
+                name: user_a.to_string(),
             })
         );
         assert_eq!(
