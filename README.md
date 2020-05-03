@@ -7,6 +7,8 @@ This demo was created for presentation at the [Ready Layer One](https://readylay
 
 ## How it works
 
+<img src="/docs/sequence.png" alt="application sequence diagram" width="500" />
+
 The Oasis platform, provides confidential smart contracts (i.e. private state).
 The private state of the [Competition service](/services/src/bin/competition.rs) stores
 the keys to encrypted off-chain test data and submitted, trained models.
@@ -20,9 +22,10 @@ This functionality is in the [UserRegstry service](/services/src/bin/user_regist
 
 ## Building the demo
 
-1. [Get the Oasis SDK](https://docs.oasis.dev/quickstart.html#set-up-the-oasis-sdk)
-2. Install [Docker](https://www.docker.com/get-started), as will be used as the off-chain app sandbox.
-3. That's it!
+To build the demo, you'll need
+
+* the [Oasis SDK](https://docs.oasis.dev/quickstart.html#set-up-the-oasis-sdk) to build and test the platform services
+* [Docker](https://www.docker.com/get-started) to train and evaluate the models
 
 ## Running the demo
 
