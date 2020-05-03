@@ -73,7 +73,7 @@ impl UserRegistry {
                     jwt::Header::default(),
                     jwt::Registered {
                         sub: Some(u.name.to_string()),
-                        aud: Some(format!("{:x}", audience)),
+                        aud: Some(Self::addr_aud(&audience)),
                         ..Default::default()
                     },
                 );
@@ -97,13 +97,17 @@ impl UserRegistry {
             _ => return Err(Error::InvalidToken),
         };
 
-        if *aud != format!("{:x}", ctx.sender())
+        if *aud != Self::addr_aud(&ctx.sender())
             || !token.verify(&self.jwt_secret, sha2::Sha256::new())
         {
             return Err(Error::PermissionDenied);
         }
 
         Ok(UserInfo { name: sub.clone() })
+    }
+
+    fn addr_aud(addr: &Address) -> String {
+        format!("{:x}", addr)
     }
 }
 

@@ -66,6 +66,7 @@ impl Competition {
         }
     }
 
+    /// All state on the Oasis platform is confidential, so we add an explicit getter.
     pub fn get_public_state(&self, _ctx: &Context) -> PublicState {
         PublicState {
             user_registry: &self.user_registry,
@@ -75,6 +76,9 @@ impl Competition {
         }
     }
 
+    /// Submits a model to the competition.
+    /// The `participant_auth_token` should have been received from the Competition's
+    /// UserRegistry.
     pub fn submit(
         &mut self,
         _ctx: &Context,
@@ -85,8 +89,8 @@ impl Competition {
             return Err(Error::SubmissionsClosed);
         }
 
-        let p_reg_client = user_registry::UserRegistryClient::new(self.user_registry);
-        match p_reg_client.verify_token(&Context::default(), &participant_auth_token) {
+        let reg_client = user_registry::UserRegistryClient::new(self.user_registry);
+        match reg_client.verify_token(&Context::default(), &participant_auth_token) {
             Ok(Ok(user_info)) => {
                 self.submissions.insert(user_info.name, model);
                 Ok(())
@@ -105,6 +109,8 @@ impl Competition {
 impl Competition {
     //! Evaluation methods. Can only be called by an attested evaluation program enclave.
 
+    /// Returns the secret data needed to evaluate the submissions to the attested
+    /// evaluation program enclave.
     pub fn begin_evaluation(
         &self,
         _ctx: &Context,
@@ -117,6 +123,7 @@ impl Competition {
         })
     }
 
+    /// Emits an event that (publicly) announces the winner of the competition.
     pub fn announce_winner(
         &self,
         _ctx: &Context,
@@ -128,6 +135,8 @@ impl Competition {
         Ok(())
     }
 
+    /// Authorizes an evaluation program enclave by validating its attestation against
+    /// the expected signature and measurement.
     fn authorize_evaluation_program(&self, attestation: &AttestationReport) -> Result<(), Error> {
         // if this were a real attestation, we'd validate the signature, but you get the idea.
         if self.is_accepting_submissions()
